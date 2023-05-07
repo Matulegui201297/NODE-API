@@ -18,14 +18,6 @@ app.listen(port, () => {
   });
 
 
-app.get('/', (req, res) => {
-  res.send('Hola Mundo!')
-});
-
-app.get('/blog', (req, res) => {
-    res.send('Hola Blog, mi nombre es Mateo!')
-  });
-  
 // BUSCAR PRODUCTOS 
 
 
