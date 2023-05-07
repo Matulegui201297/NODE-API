@@ -8,9 +8,14 @@ const Producto = require('./models/productModels');
 const port = 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({extended:false}));
 
 
-// ROUTES
+// RUTAS
+
+app.listen(port, () => {
+    console.log(`La conexion funciona bien en el puerto ${port}`)
+  });
 
 
 app.get('/', (req, res) => {
@@ -21,31 +26,82 @@ app.get('/blog', (req, res) => {
     res.send('Hola Blog, mi nombre es Mateo!')
   });
   
-
-app.listen(port, () => {
-  console.log(`La conexion funciona bien en el puerto ${port}`)
-});
+// BUSCAR PRODUCTOS 
 
 
-app.get('/product', async (req, res) => {
+app.get('/productos', async (req,res) => {
     try {
-        
+        const productos = await Producto.find({});
+        res.status(200).json(productos);
     } catch (error) {
         res.status(500).json({message: error.message})
     }
 })
 
+// BUSCAR PRODUCTOS POR ID
 
+app.get('/productos/:id', async (req,res) => {
+    try {
+        const {id} = req.params;
+        const producto = await Producto.findById(id);
+        res.status(200).json(producto);
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
 
-app.post('/product', async (req, res) => {
+// CREAR PRODUCTOS 
+
+app.post('/producto', async (req, res) => {
    try {
-    const product = await Producto.create(req.body)
-    res.status(200).json(product);
+    const producto = await Producto.create(req.body)
+    res.status(200).json(producto);
    } 
    catch (error) {
     console.log(error.message)
     res.status(500).json({message: error.message})
    }
+})
+
+
+// ACTUALIZAR PRODUCTOS
+
+app.put('/productos/:id', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const producto = await Producto.findByIdAndUpdate(id, req.body);
+
+
+        // si no se encuentra el producto en la  base de datos
+        
+        if (!producto) {
+            return res.status(404).json({message: 'Producto no encontrado'}) 
+        }
+        const productoActualizado = await Producto.findById(id);
+        res.status(200).json({productoActualizado});
+    
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
+
+// BORRAR PRODUCTOS
+
+app.delete('/productos/:id', async (req, res) => {
+    try {
+        const {id} = req.params;
+        const producto = await Producto.findByIdAndDelete(id);
+
+        // si no se encuentra el producto en la  base de datos
+        
+        if (!producto) {
+            return res.status(404).json({message: 'Producto no encontrado'}) 
+        }
+        res.status(200).json({producto});
+
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
 })
 
 
